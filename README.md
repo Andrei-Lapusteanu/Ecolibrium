@@ -3,7 +3,7 @@
 
  - Ecosystem simultator - Very early build, work in progress  
  - A more detailed description will soon be added 
- - Developed in **Unity 2019.3.0f5**
+ - Developed in **Unity 2019.3.0f5** - due to some seralization errors, the project **cannot be ran properly** on an older version of Unity (for now)
  
  ## Notice
 **If you want to disable the debug lines** (used in order to render what an animal "sees" - its surroundings and current path) you can do so by clicking the **Gizmos** button in the top right-corner of the *Scene* or *Game* tabs in Unity
@@ -16,6 +16,6 @@
 **Scroll up/down** zooms in or out
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMzY1Mzk4NzQ2LDExOTk2MzM1MzUsLTIxMD
-k1NjU4MDRdfQ==
+eyJoaXN0b3J5IjpbLTgzMjgxMjU3MCwzNjUzOTg3NDYsMTE5OT
+YzMzUzNSwtMjEwOTU2NTgwNF19
 -->
