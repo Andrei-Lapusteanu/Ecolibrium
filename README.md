@@ -12,12 +12,11 @@
 
  - **W-A-S-D** keys to move camera  
  - **Q-E** will rotate the camera with respect to the world's Y axis 
- - **Left-click** on an animal to show
-   its properties
+ - **Left-click** on an animal to show its properties
  - **Right-click + mouse drag** will pan the camera
 - **Scroll up/down** zooms in or out
 
 <!--stackedit_data:
-eyJoaXN0b3J5IjpbMTMyNTA3OTExLDM2NTM5ODc0NiwxMTk5Nj
-MzNTM1LC0yMTA5NTY1ODA0XX0=
+eyJoaXN0b3J5IjpbLTE4NDE1NDUxMjcsMTMyNTA3OTExLDM2NT
+M5ODc0NiwxMTk5NjMzNTM1LC0yMTA5NTY1ODA0XX0=
 -->
