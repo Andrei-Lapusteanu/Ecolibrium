@@ -53,12 +53,18 @@ public class CameraController : MonoBehaviour
 
         // Speed up time
         if (Input.GetKey(KeyCode.KeypadPlus))
-            Time.timeScale += 0.1f;
+            if (Time.timeScale < 10)
+                Time.timeScale += 0.1f;
 
         // Slow down time
         if (Input.GetKey(KeyCode.KeypadMinus))
-            if(Time.timeScale > 1.0)
+            if (Time.timeScale > 1.0f)
+            {
                 Time.timeScale -= 0.1f;
+
+                if (Time.timeScale < 1.0f)
+                    Time.timeScale = 1.0f;
+            }
 
         // Move camera forward
         if (Input.GetKey(KeyCode.W))

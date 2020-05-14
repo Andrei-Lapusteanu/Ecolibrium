@@ -21,6 +21,9 @@ public class Wolf : AnimalController
 
     private const string animVarName = "wolf_state";
 
+    public Gender genderUI;
+    public GameObject spawnParticleEffect;
+
     Animator anim;
     NavMeshAgent agent;
     StatusPanelController spc;
@@ -33,10 +36,14 @@ public class Wolf : AnimalController
     Coroutine goAfterFoodRoutine = null;
 
     GameObject foodTarget = null;
+    GameObject mateTarget = null;
+
     bool isLookingForFood = false;
     bool isScanningForFood = false;
     bool isGoingAfterFood = false;
+
     bool hasLostFood = false;
+    bool hasLostMate = false;
 
     // Start is called before the first frame update
     void Start()
@@ -50,7 +57,7 @@ public class Wolf : AnimalController
 
         // Start coroutines
         StartCoroutine(StopAgentRoutine(agent, anim, animVarName, STATE_IDLE));
-        StartCoroutine(ModifyAttribsOverTime());
+        StartCoroutine(ModifyAttribsOverTime(AnimalType.Wolf));
         mainAI = StartCoroutine(MainAI());
 
         // Make a kvp list of all states
@@ -76,7 +83,7 @@ public class Wolf : AnimalController
         if (spc.IsActive == true)
         {
             // Update static panel elements once
-            StatusPanelController.UpdateStaticElementsOnce(spc, Resources.Load<Sprite>("_Mine/Images/wolf_icon"), "Wolf " + GetGenderString(this.gender));
+            StatusPanelController.UpdateStaticElementsOnce(spc, Resources.Load<Sprite>("_Mine/Images/wolf_icon"), "Wolf " + GetGenderString(this.Gender));
 
             // Update dynamic panel elements
             UpdateStatusPanelValues(spc, states, currentState, Vector3.Magnitude(agent.velocity), foodTarget);
@@ -88,6 +95,9 @@ public class Wolf : AnimalController
     {
         for (; ; )
         {
+            // DE STERS
+            this.genderUI = base.Gender;
+
             if (currentState == STATE_IDLE || currentState == STATE_WALK || currentState == STATE_SIT_DOWN || currentState == STATE_CREEP || currentState == STATE_SLEEP)
             {
                 if (IsHungry() == HungerState.VeryHungry || (IsHungry() == HungerState.Hungry && IsTired() != TirednessState.VeryTired))
@@ -103,7 +113,7 @@ public class Wolf : AnimalController
             switch (currentState)
             {
                 case STATE_IDLE:
-                    Idle();
+                    Idle(agent, true, anim, animVarName, STATE_IDLE);
                     Debug.DrawLine(transform.position + Vector3.up, agent.destination, Color.green, 4);
                     yield return new WaitForSeconds(Random.Range(2f, 10f));
 
@@ -117,14 +127,14 @@ public class Wolf : AnimalController
                     break;
 
                 case STATE_WALK:
-                    Walk();
+                    Walk(agent, false, anim, animVarName, STATE_WALK);
                     Debug.DrawLine(transform.position + Vector3.up, agent.destination, Color.green, 4);
                     yield return new WaitForSeconds(Random.Range(2f, 10f));
 
                     break;
 
                 case STATE_RUN:
-                    Run();
+                    Run(agent, false, anim, animVarName, STATE_RUN);
                     Debug.DrawLine(transform.position + Vector3.up, agent.destination, Color.green, 4);
                     yield return new WaitForSeconds(Random.Range(2f, 10f));
 
@@ -140,10 +150,17 @@ public class Wolf : AnimalController
                 case STATE_LOOK_FOR_FOOD:
 
                     if (isLookingForFood == false)
-                        lookForFoodRoutine = StartCoroutine(TryLookingForFood());
+                    {
+                        lookForFoodRoutine = StartCoroutine(TryLookingForFood(agent, anim, animVarName, STATE_RUN));
+                        isLookingForFood = true;
+                    }
 
                     if (isScanningForFood == false)
-                        isFoodInRangeRoutine = StartCoroutine(IsFoodInRange());
+                    {
+                        isFoodInRangeRoutine = StartCoroutine(IsFoodInRange("Rabbit", SetFoodTarget));
+                        isScanningForFood = true;
+                    }
+
 
                     if (IsTired() == TirednessState.VeryTired && IsHungry() != HungerState.VeryHungry)
                     {
@@ -165,13 +182,17 @@ public class Wolf : AnimalController
                     }
 
                     if (isGoingAfterFood == false)
-                        goAfterFoodRoutine = StartCoroutine(GoAfterFood());
+                    {
+                        goAfterFoodRoutine = StartCoroutine(GoAfterFood(foodTarget, SetFoodTarget, SetHasLostFood, agent, anim, animVarName, STATE_RUN));
+                        isGoingAfterFood = true;
+                    }
 
                     if (foodTarget != null)
                     {
                         if (CanEatFood(foodTarget, transform, 4f) == true)
                             currentState = STATE_EAT;
                     }
+
                     else if(foodTarget == null)
                         currentState = STATE_LOOK_FOR_FOOD;
 
@@ -181,11 +202,11 @@ public class Wolf : AnimalController
                     break;
 
                 case STATE_EAT:
-                    Eat();
+                    Eat(foodTarget, SetFoodTarget, SetCurrentState, STATE_IDLE, 20.0f, "Wolf");
                     break;
 
                 case STATE_SEARCH_FOR_MATE:
-                    SearchForMate();
+                    //SearchForMate();
                     break;
 
                 case STATE_BREED:
@@ -193,7 +214,7 @@ public class Wolf : AnimalController
                     break;
 
                 case STATE_SLEEP:
-                    Sleep();
+                    Sleep(agent, true, anim, animVarName, STATE_SIT_DOWN);
                     break;
             }
 
@@ -237,105 +258,9 @@ public class Wolf : AnimalController
         }
     }
 
-    protected override IEnumerator TryLookingForFood()
-    {
-        isLookingForFood = true;
-
-        for (; ; )
-        {
-            NavMeshHit navHit = new NavMeshHit();
-            Vector3 randDir = Random.insideUnitSphere * 100f;
-
-            randDir += transform.position;
-            NavMesh.SamplePosition(randDir, out navHit, 100f, -1);
-
-            if (IsHungry() == HungerState.VeryHungry)
-                NavAgentCommand(agent, false, GetSpeed(), anim, animVarName, STATE_RUN, navHit.position);
-
-            else if(IsHungry() == HungerState.Hungry)
-                NavAgentCommand(agent, false, GetWalkSpeed(), anim, animVarName, STATE_WALK, navHit.position);
-
-            yield return new WaitForSeconds(5f);
-        }
-    }
-
-    protected override IEnumerator IsFoodInRange()
-    {
-        isScanningForFood = true;
-
-        for (; ; )
-        {
-            Collider[] colliders = Physics.OverlapSphere(transform.position, 20.0f, -1, QueryTriggerInteraction.Collide);
-            float currentDist = float.MaxValue;
-            float closestFoodDist = float.MaxValue;
-            GameObject target = null;
-
-            foreach (Collider collider in colliders)
-                if (collider.tag == "Rabbit")
-                {
-                    currentDist = Vector3.Distance(transform.position, collider.transform.position);
-
-                    if (currentDist < closestFoodDist)
-                    {
-                        closestFoodDist = currentDist;
-                        target = collider.gameObject;
-                    }
-
-                    Debug.DrawLine(transform.position + Vector3.up, collider.transform.position, Color.yellow, 4);
-                }
-
-            foodTarget = target;
-
-            yield return new WaitForSeconds(0.25f);
-        }
-    }
-
-    protected override IEnumerator GoAfterFood()
-    {
-        isGoingAfterFood = true;
-
-        for (; ; )
-        {
-            if (foodTarget == null)
-                yield return null;
-
-            else if (Vector3.Distance(transform.position, foodTarget.transform.position) < 20.0f)
-            {
-                hasLostFood = false;
-                NavAgentCommand(agent, false, GetSpeed(), anim, animVarName, STATE_RUN, foodTarget.transform.position);
-            }
-            else
-            {
-                hasLostFood = true;
-                foodTarget = null;
-            }
-
-            yield return new WaitForSeconds(0.25f);
-        }
-    }
-
-    protected override void Idle()
-    {
-        NavAgentCommand(agent, true, agent.speed, anim, animVarName, STATE_IDLE);
-    }
-
     private void SitDown()
     {
         NavAgentCommand(agent, true, agent.speed, anim, animVarName, STATE_SIT_DOWN);
-    }
-
-    protected override void Walk()
-    {
-        NavAgentCommand(agent, false, GetWalkSpeed(), anim, animVarName, STATE_WALK);
-
-        WalkToRandPos(agent, GetWalkSpeed(), 20.0f);
-    }
-
-    protected override void Run()
-    {
-        NavAgentCommand(agent, false, GetSpeed(), anim, animVarName, STATE_RUN);
-
-        WalkToRandPos(agent, GetSpeed(), 20.0f);
     }
 
     protected void Creep()
@@ -345,37 +270,14 @@ public class Wolf : AnimalController
         WalkToRandPos(agent, GetWalkSpeed(), 20.0f);
     }
 
-    protected override void Eat()
-    {
-        if (foodTarget != null)
-        {
-            Destroy(foodTarget, 0f);
-            foodTarget = null;
-            satiety += 20f;
-        }
-
-        currentState = STATE_IDLE;
-    }
-
-    protected override void SearchForMate()
-    {
-        throw new System.NotImplementedException();
-    }
-
     protected override void Breed()
     {
         throw new System.NotImplementedException();
     }
 
-    protected override void Sleep()
-    {
-        base.isSleeping = true;
-        NavAgentCommand(agent, true, agent.speed, anim, animVarName, STATE_SIT_DOWN);
-    }
-
     protected override void Die()
     {
-        throw new System.NotImplementedException();
+        Destroy(this.gameObject, 0f);
     }
 
     List<KeyValuePair<int, string>> GroupStates()
@@ -394,6 +296,42 @@ public class Wolf : AnimalController
             new KeyValuePair<int, string>(STATE_BREED, "Breeding <3"),
             new KeyValuePair<int, string>(STATE_SLEEP, "Sleeping")
         };
+    }
+
+    public void PlaySpawnEffect()
+    {
+        // Play particle effect
+        GameObject partileInst = Instantiate(spawnParticleEffect, transform);
+        partileInst.transform.GetChild(0).GetComponent<ParticleSystem>().Play();
+        partileInst.transform.GetChild(1).GetComponent<ParticleSystem>().Play();
+
+        // Destroy effect
+        Destroy(partileInst, 2.0f);
+    }
+
+    public void SetFoodTarget(GameObject newfoodTarget)
+    {
+        foodTarget = newfoodTarget;
+    }
+
+    public void SetHasLostFood(bool newBoolValue)
+    {
+        hasLostFood = newBoolValue;
+    }
+
+    public void SetMateTarget(GameObject newMateTarget)
+    {
+        mateTarget = newMateTarget;
+    }
+
+    public void SetHasLostMate(bool newBoolValue)
+    {
+        hasLostMate = newBoolValue;
+    }
+
+    public void SetCurrentState(int newState)
+    {
+        currentState = newState;
     }
 
     public void ActivatePanel()

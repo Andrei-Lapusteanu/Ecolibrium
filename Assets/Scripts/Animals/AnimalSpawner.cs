@@ -8,7 +8,7 @@ public class AnimalSpawner : MonoBehaviour
 
     private const string RABBIT_MALE = "Rabbits/Prefabs/Rabbit_male";
     private const string RABBIT_FEMALE = "Rabbits/Prefabs/Rabbit_female";
-    private const string RABBIT_CUB = "Rabbits/Prefabs/Rabbit Cub";
+    private const string RABBIT_CUB = "Rabbits/Prefabs/Rabbit_cub";
     private const string WOLF_MALE = "Wolf/Wolf_male";
     private const string WOLF_FEMALE = "Wolf/Wolf_female";
     private const string WOLF_CUB = "Wolf/Wolf_cub";
@@ -35,12 +35,13 @@ public class AnimalSpawner : MonoBehaviour
     GameObject wolf_female;
     GameObject wolf_cub;
 
+
     // Start is called before the first frame update
     void Start()
     {
         LoadAnimalPrefabs();
-        GenerateGroups();
-        GenerateAnimals();
+        //GenerateGroups();
+        //GenerateAnimals();
     }
 
     // Update is called once per frame
@@ -115,7 +116,7 @@ public class AnimalSpawner : MonoBehaviour
 
     public void GenerateAnimals()
     {
-        int wolfCounter = 0, rabbitCounter = 0;
+        //int wolfCounter = 0, rabbitCounter = 0;
         for (int i = 0; i < wolfGroupPos.Count; i++)
         {
             int wolvesPerGroup = Random.Range(MIN_WOLVES_PER_GROUP, MAX_WOLVES_PER_GROUP + 1);
@@ -126,12 +127,12 @@ public class AnimalSpawner : MonoBehaviour
                 if (thisGender == Gender.Male)
                 {
                     GameObject wolfMaleInst = Instantiate(wolf_male, wolfGroupPos[i] + GenerateGroupPosOffset(), Quaternion.identity);
-                    wolfMaleInst.GetComponent<Wolf>().CreateAnimalRandAttributes(AnimalType.Wolf, thisGender, wolfCounter++);
+                    wolfMaleInst.GetComponent<Wolf>().CreateAnimalRandAttributes(AnimalType.Wolf, thisGender, WorldLimits.WolfCounter++);
                 }
                 else
                 {
                     GameObject wolfFemaleInst = Instantiate(wolf_female, wolfGroupPos[i] + GenerateGroupPosOffset(), Quaternion.identity);
-                    wolfFemaleInst.GetComponent<Wolf>().CreateAnimalRandAttributes(AnimalType.Wolf, thisGender, wolfCounter++);
+                    wolfFemaleInst.GetComponent<Wolf>().CreateAnimalRandAttributes(AnimalType.Wolf, thisGender, WorldLimits.WolfCounter++);
                 }
             } 
         }
@@ -146,14 +147,88 @@ public class AnimalSpawner : MonoBehaviour
                 if (thisGender == Gender.Male)
                 {
                     GameObject rabbitMaleInst = Instantiate(rabbit_male, rabbitGroupPos[i] + GenerateGroupPosOffset(), Quaternion.identity);
-                    rabbitMaleInst.GetComponent<Rabbit>().CreateAnimalRandAttributes(AnimalType.Rabbit, thisGender, rabbitCounter++);
+                    rabbitMaleInst.GetComponent<Rabbit>().CreateAnimalRandAttributes(AnimalType.Rabbit, thisGender, WorldLimits.RabbitCounter++);
                 }
                 else
                 {
                     GameObject rabbitFemaleInst = Instantiate(rabbit_female, rabbitGroupPos[i] + GenerateGroupPosOffset(), Quaternion.identity);
-                    rabbitFemaleInst.GetComponent<Rabbit>().CreateAnimalRandAttributes(AnimalType.Rabbit, thisGender, rabbitCounter++);
+                    rabbitFemaleInst.GetComponent<Rabbit>().CreateAnimalRandAttributes(AnimalType.Rabbit, thisGender, WorldLimits.RabbitCounter++);
                 }
             }
+        }
+    }
+
+    public void BirthCub(AnimalController child, Transform mother, AnimalType animalType)
+    {
+        switch (animalType)
+        {
+            case AnimalType.Rabbit:
+                GameObject childInst = Instantiate(rabbit_cub, mother.position, Quaternion.identity);
+                childInst.GetComponent<Rabbit>().SetNewAnimalAttributes(child, GenerateGender());
+                childInst.GetComponent<Rabbit>().PlaySpawnEffect();
+                WorldLimits.RabbitCounter++;
+                break;
+
+            case AnimalType.Wolf:
+                childInst = Instantiate(wolf_cub, mother.position, Quaternion.identity);
+                childInst.GetComponent<Wolf>().SetNewAnimalAttributes(child, GenerateGender());
+                childInst.GetComponent<Wolf>().PlaySpawnEffect();
+                WorldLimits.WolfCounter++;
+                break;
+        }
+
+        // TODO testing
+        rabbit_male.GetComponent<Rabbit>().testing = false;
+        rabbit_female.GetComponent<Rabbit>().testing = false;
+
+        //wolf_male.GetComponent<Wolf>().testing = false;
+        //wolf_female.GetComponent<Wolf>().testing = false;
+
+    }
+
+    // TODO - testing
+    private void OnDestroy()
+    {
+        rabbit_male.GetComponent<Rabbit>().testing = true;
+        rabbit_female.GetComponent<Rabbit>().testing = true;
+    }
+
+    public void GrowUpAnimal(AnimalController child)
+    {
+        switch(child.Type)
+        {
+            case AnimalType.Rabbit:
+
+                if(child.Gender == Gender.Male)
+                {
+                    GameObject rabbitMaleInst = Instantiate(rabbit_male, child.transform.position, Quaternion.identity);
+                    rabbitMaleInst.GetComponent<Rabbit>().SetGrownUpAnimalAttributes(child, child.Gender);
+                    WorldLimits.RabbitCounter++;
+                }
+                else
+                {
+                    GameObject rabbitFemaleInst = Instantiate(rabbit_female, child.transform.position, Quaternion.identity);
+                    rabbitFemaleInst.GetComponent<Rabbit>().SetGrownUpAnimalAttributes(child, child.Gender);
+                    WorldLimits.RabbitCounter++;
+                }
+
+                break;
+
+            case AnimalType.Wolf:
+
+                if (child.Gender == Gender.Male)
+                {
+                    GameObject wolfMaleInst = Instantiate(wolf_male, child.transform.position, Quaternion.identity);
+                    wolfMaleInst.GetComponent<Rabbit>().SetGrownUpAnimalAttributes(child, child.Gender);
+                    WorldLimits.WolfCounter++;
+                }
+                else
+                {
+                    GameObject wolfFemaleInst = Instantiate(wolf_female, child.transform.position, Quaternion.identity);
+                    wolfFemaleInst.GetComponent<Rabbit>().SetGrownUpAnimalAttributes(child, child.Gender);
+                    WorldLimits.WolfCounter++;
+                }
+                break;
         }
     }
 }

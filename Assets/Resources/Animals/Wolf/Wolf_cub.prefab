@@ -2242,6 +2242,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bfe1d81831c3434fa504a9cccba3e5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  genderUI: 0
+  spawnParticleEffect: {fileID: 4042301004290648293, guid: 1f2ba1d49e5f5aa4194ccc1eb21b5c32,
+    type: 3}
 --- !u!65 &3144148229309422837
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -31,6 +31,13 @@ public class StatusPanelController : MonoBehaviour
     Slider ageSlider;
     TextMeshProUGUI ageValueTmp;
 
+    // Reproduce panel
+    Slider reproduceSlider;
+    TextMeshProUGUI reproduceValueTmp;
+
+    // FoodSight panel
+    TextMeshProUGUI foodSightValueTmp;
+
     int id;
     bool isActive = false;
 
@@ -61,6 +68,13 @@ public class StatusPanelController : MonoBehaviour
         // Age panel
         AgeSlider = gameObject.transform.Find("PanelAge/AgeBar").GetComponent<Slider>();
         AgeValueTmp = gameObject.transform.Find("PanelAge/AgeValue").GetComponent<TextMeshProUGUI>();
+
+        // Reproduce panel
+        ReproduceSlider = gameObject.transform.Find("PanelReproduce/ReproduceBar").GetComponent<Slider>();
+        ReproduceValueTmp = gameObject.transform.Find("PanelReproduce/ReproduceValue").GetComponent<TextMeshProUGUI>();
+
+        // FoodSight panel
+        FoodSightValueTmp = gameObject.transform.Find("PanelFoodSight/FoodSightValue").GetComponent<TextMeshProUGUI>();
     }
 
     // Update is called once per frame
@@ -116,6 +130,15 @@ public class StatusPanelController : MonoBehaviour
                 spc.AgeValueTmp.text = value.ToString("0.0") + "/" + maxValue.ToString("0.0");
                 spc.AgeSlider.value = value / maxValue;
                 break;
+
+            case StatusType.Reproduce:
+                spc.ReproduceValueTmp.text = value.ToString("0.0") + "/" + maxValue.ToString("0.0");
+                spc.ReproduceSlider.value = value / maxValue;
+                break;
+
+            case StatusType.FoodSight:
+                spc.FoodSightValueTmp.text = value.ToString("0.0");
+                break;
         }
     }
 
@@ -139,7 +162,8 @@ public class StatusPanelController : MonoBehaviour
     public static void HideAll()
     {
         foreach (Transform child in GameObject.Find("MainCanvas").transform)
-            child.GetComponent<StatusPanelController>().Hide();
+            if (child.GetComponent<StatusPanelController>() != null)
+                child.GetComponent<StatusPanelController>().Hide();
     }
 
     public Image AnimalIcon { get => animalIcon; set => animalIcon = value; }
@@ -155,5 +179,8 @@ public class StatusPanelController : MonoBehaviour
     public TextMeshProUGUI SpeedValueTmp { get => speedValueTmp; set => speedValueTmp = value; }
     public Slider AgeSlider { get => ageSlider; set => ageSlider = value; }
     public TextMeshProUGUI AgeValueTmp { get => ageValueTmp; set => ageValueTmp = value; }
+    public Slider ReproduceSlider { get => reproduceSlider; set => reproduceSlider = value; }
+    public TextMeshProUGUI ReproduceValueTmp { get => reproduceValueTmp; set => reproduceValueTmp = value; }
+    public TextMeshProUGUI FoodSightValueTmp { get => foodSightValueTmp; set => foodSightValueTmp = value; }
     public bool IsActive { get => isActive; set => isActive = value; }
 }
