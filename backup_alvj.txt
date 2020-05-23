@@ -1,0 +1,29 @@
+            if(currentState == STATE_SEARCH_FOR_FOOD)
+            {
+                StartCoroutine(IsFoodInRange());
+
+                if (foodInRange == true)
+                    currentState = STATE_GO_AFTER_FOOD;
+                else
+                    currentState = STATE_SEARCH_FOR_FOOD;
+            }
+
+            //if (GoingAfterFood == true)
+            //    yield return new WaitForSeconds(3f);
+
+            if (currentState != STATE_GO_AFTER_FOOD)
+            {
+                if (IsHungry() == HungerState.VeryHungry)
+                    currentState = STATE_SEARCH_FOR_FOOD;
+
+                else if (IsHungry() == HungerState.Hungry && IsTired() != TirednessState.VeryTired)
+                    currentState = STATE_SEARCH_FOR_FOOD;
+
+                else if (IsHungry() == HungerState.Hungry && IsTired() == TirednessState.VeryTired)
+                    currentState = STATE_SLEEP;
+
+                else if (IsHungry() == HungerState.NotHungry && IsTired() != TirednessState.NotTired)
+                    currentState = STATE_SLEEP;
+
+                else if (IsHungry() == HungerState.NotHungry && IsTired() == TirednessState.NotTired)
+                    currentState = Random.Range(0, 3);

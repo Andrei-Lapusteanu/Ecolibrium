@@ -741,7 +741,7 @@ Animator:
   m_Controller: {fileID: 9100000, guid: 27893e88a80674044829b1ef1e7fda0d, type: 2}
   m_CullingMode: 1
   m_UpdateMode: 0
-  m_ApplyRootMotion: 1
+  m_ApplyRootMotion: 0
   m_LinearVelocityBlending: 0
   m_WarningMessage: 
   m_HasTransformHierarchy: 1
@@ -782,8 +782,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   genderUI: 1
+  testing: 0
   spawnParticleEffect: {fileID: 0}
-  testing: 1
 --- !u!65 &8637473403539718905
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -8,11 +8,11 @@ public class PlantSpawner : MonoBehaviour
     private const string PLANTAIN_PATH = "Plants/Plantain";
     private const string DANDELION_PATH = "Plants/Dandelion";
 
-    private const int MIN_PLANT_GROUPS = 75;
-    private const int MAX_PLANT_GROUPS = 100;
+    private const int MIN_PLANT_GROUPS = 70;
+    private const int MAX_PLANT_GROUPS = 90;
 
-    private const int MIN_PLANTS_PER_GROUP = 3;
-    private const int MAX_PLANTS_PER_GROUP = 10;
+    private const int MIN_PLANTS_PER_GROUP = 7;
+    private const int MAX_PLANTS_PER_GROUP = 12;
 
     private const float GROUP_OFFSET = 8.0f;
     private const float PLANT_OFFSET = 3.0f;
@@ -23,6 +23,14 @@ public class PlantSpawner : MonoBehaviour
     GameObject grass;
     GameObject plantain;
     GameObject dandelion;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        LoadPlantPrefabs();
+        GenerateGroups();
+        GeneratePlants();
+    }
 
     public void LoadPlantPrefabs()
     {
@@ -66,19 +74,5 @@ public class PlantSpawner : MonoBehaviour
             for(int j = 0; j < plantsPerGroup; j++)
                 Instantiate(plants[Random.Range(0, plants.Count)], plantGroupPos[i] + GenerateGroupPosOffset(), Quaternion.identity);
         }
-    }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        LoadPlantPrefabs();
-        GenerateGroups();
-        GeneratePlants();
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
     }
 }

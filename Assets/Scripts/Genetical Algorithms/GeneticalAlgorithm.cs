@@ -22,17 +22,20 @@ public static class GeneticalAlgorithm<T>
         parent_2 = p2;
         animalSpawner = GameObject.Find("AnimalSpawnerController").GetComponent<AnimalSpawner>();
 
-        if ((parent_1 as AnimalController).Type == AnimalType.Rabbit)
+        // Set child type
+        if ((parent_1 as AnimalController).Species == AnimalType.Rabbit)
             child = new Rabbit();
         else
             child = new Wolf();
 
+        // Get parent attributes
         List<KeyValuePair<float, AttribType>> p1_attribs = (parent_1 as AnimalController).GetPackedAttribs();
         List<KeyValuePair<float, AttribType>> p2_attribs = (parent_2 as AnimalController).GetPackedAttribs();
 
-        // Crossover
+        // For each attribute 
         for(int i = 0; i < p1_attribs.Count; i++)
         {
+            // Crossover
             bool shouldMutate = Crossover(p1_attribs[i].Key, p2_attribs[i].Key, p1_attribs[i].Value);
 
             // Mutation
@@ -40,11 +43,14 @@ public static class GeneticalAlgorithm<T>
                 Mutate(p1_attribs[i].Value);
         }
 
-        // Spawn cub
+        // Boost attribues based on death cause
+        BoostAttributes();
+
+        // Spawn child
         if ((parent_1 as AnimalController).Gender == Gender.Female)
-            animalSpawner.BirthCub(child, (parent_1 as AnimalController).transform, (parent_1 as AnimalController).Type);
+            animalSpawner.BirthCub(child, (parent_1 as AnimalController).transform, (parent_1 as AnimalController).Species);
         else
-            animalSpawner.BirthCub(child, (parent_2 as AnimalController).transform, (parent_2 as AnimalController).Type);
+            animalSpawner.BirthCub(child, (parent_2 as AnimalController).transform, (parent_2 as AnimalController).Species);
     }
 
     private static bool Crossover(float attrib_p1, float attrib_p2, AttribType attribType)
@@ -106,8 +112,8 @@ public static class GeneticalAlgorithm<T>
         switch (attribType)
         {
             case AttribType.MaxHP:
-                // Attenuate mutation offset for HP (if not, it will cause imbalance after may generations)
-                // Because HP has a high base value, it influences in a big proportion the fitness calculation
+                // Attenuate mutation offset for HP (if not, it will cause imbalance after many generations)
+                // Because HP has a high base value, it heavily influences the fitness calculation
                 mutationOffset = (mutationOffset + 1f) / 2f;
 
                 child.MaxHealthPoints *= mutationOffset;
@@ -130,12 +136,69 @@ public static class GeneticalAlgorithm<T>
                 break;
 
             case AttribType.MaxFoodSight:
-                // Attenuate mutation offset for food sight (if not, it will cause imbalance after may generations)
-                // Because food sight has a high base value, it influences in a big proportion the fitness calculation
+                // Attenuate mutation offset for food sight (if not, it will cause imbalance after many generations)
+                // Because food sight has a high base value, it heavily influences the fitness calculation
                 mutationOffset = (mutationOffset + 1f) / 2f;
 
                 child.MaxFoodSight *= mutationOffset;
                 break;
+        }
+    }
+
+    private static void BoostAttributes()
+    {
+        // If child is a rabbit
+        if(child.GetType() == typeof(Rabbit))
+        {
+            // Increase reproduce speed based on population count
+            if(AnimalCounter.RabbitsAlive < 50)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_RABBIT * 3f;
+
+            else if (AnimalCounter.RabbitsAlive > 50 && AnimalCounter.RabbitsAlive < 75)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_RABBIT * 2f;
+
+            else if (AnimalCounter.RabbitsAlive > 75 && AnimalCounter.RabbitsAlive < 150)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_RABBIT;
+
+            else if (AnimalCounter.RabbitsAlive > 150 && AnimalCounter.RabbitsAlive < 250)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_RABBIT * 0.6f;
+
+            else if (AnimalCounter.RabbitsAlive > 250)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_RABBIT * 0.4f;
+
+            child.MaxHealthPoints += (AnimalCounter.RabbitDeathsByHunger / 100f);
+
+            child.MaxSatiety += (AnimalCounter.RabbitDeathsByHunger / 100f);
+
+            //child.MaxSpeed += (AnimalCounter.RabbitDeathsByBeingEaten / 300f);
+
+        }
+
+        // If child is a wolf
+        else if (child.GetType() == typeof(Wolf))
+        {
+            // Increase reproduce speed based on population count
+            if (AnimalCounter.WolvesAlive < 15)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_WOLF * 2;
+
+            else if (AnimalCounter.WolvesAlive > 15 && AnimalCounter.WolvesAlive < 25)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_WOLF * 2f;
+
+            else if (AnimalCounter.WolvesAlive > 20 && AnimalCounter.WolvesAlive < 40)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_WOLF;
+
+            else if (AnimalCounter.WolvesAlive > 40 && AnimalCounter.WolvesAlive < 50)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_WOLF * 0.75f;
+
+            else if (AnimalCounter.WolvesAlive > 50)
+                child.ReproduceSpeed = AnimalController.BASE_REPRODUCE_SPEED_WOLF * 0.5f;
+
+            child.MaxHealthPoints += (AnimalCounter.WolfDeathsByHunger / 100f);
+
+            child.MaxSatiety += (AnimalCounter.WolfDeathsByHunger / 100f);
+
+            child.MaxSpeed += (AnimalCounter.WolfDeathsByHunger / 350f);
+
         }
     }
 }

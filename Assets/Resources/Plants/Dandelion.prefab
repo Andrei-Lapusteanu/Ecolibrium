@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5446541174481201014}
   - component: {fileID: 5865705308201357312}
   - component: {fileID: 627616603006690424}
+  - component: {fileID: -7766567351820254499}
   m_Layer: 0
   m_Name: Dandelion
   m_TagString: Plant
@@ -104,5 +105,17 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 115dcbc8d25ad5a44926857468f759b8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!114 &-7766567351820254499
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5460226114301231490}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c602f8a509207d54193c9cfc67d76f25, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 

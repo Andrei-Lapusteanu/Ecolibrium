@@ -2351,7 +2351,7 @@ NavMeshAgent:
   m_AngularSpeed: 120
   m_StoppingDistance: 0
   m_AutoTraverseOffMeshLink: 1
-  m_AutoBraking: 1
+  m_AutoBraking: 0
   m_AutoRepath: 1
   m_Height: 0.5
   m_BaseOffset: 0
@@ -2369,6 +2369,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bfe1d81831c3434fa504a9cccba3e5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  genderUI: 0
+  spawnParticleEffect: {fileID: 0}
 --- !u!65 &8899456371834304088
 BoxCollider:
   m_ObjectHideFlags: 0

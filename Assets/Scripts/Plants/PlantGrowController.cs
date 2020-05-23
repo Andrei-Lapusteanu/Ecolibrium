@@ -37,7 +37,7 @@ public class PlantGrowController : MonoBehaviour
                 // Animate plant growth
                 transform.localScale += new Vector3(growBackRate, growBackRate, growBackRate);
 
-                // IF plant is half grown, cub can eat it
+                // If plant is half grown, cub can eat it
                 if (transform.localScale.x >= (targetScale.x / 2f))
                     canCubEat = true;
                     
@@ -46,7 +46,6 @@ public class PlantGrowController : MonoBehaviour
             else
             {
                 transform.localScale = targetScale;
-                isEatable = true;
 
                 // Adult can eat it (if plan fully grown)
                 canAdultEat = true;
@@ -60,23 +59,6 @@ public class PlantGrowController : MonoBehaviour
 
     public void GetEaten(AdultState adultState)
     {
-        // Fixes bug in which rabbits can eat same plant at the same time
-        //if (IsEatable == true)
-        //{
-        //    if(adultState == AdultState.Adult)
-        //    {
-        //        transform.localScale = Vector3.zero;
-        //        StartCoroutine(GrowBack());
-        //        isEatable = false;
-        //    }
-        //    else
-        //    {
-        //        transform.localScale = targetScale / 2f;
-        //        StartCoroutine(GrowBack());
-        //        isEatable = false;
-        //    }
-        //}
-
         if(adultState == AdultState.Adult)
         {
             if (canAdultEat == true)
